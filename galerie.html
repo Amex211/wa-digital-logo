@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Projektfotos — WA Digitalpartner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --ember: #E05A33;
+            --ember-light: #F47B5A;
+            --ember-deep: #C44425;
+            --coal: #111111;
+            --coal-warm: #1A1714;
+            --coal-mid: #252220;
+            --bone: #FAF7F4;
+            --ash: #F2ECE6;
+            --text-dim: #8A8078;
+            --gold: #D4A853;
+            --green: #3A9B68;
+            --radius: 20px;
+            --radius-sm: 12px;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--coal-warm);
+            color: var(--bone);
+            min-height: 100vh;
+            min-height: 100svh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Grain overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            opacity: 0.02;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 10000;
+        }
+
+        /* === HEADER === */
+        .header {
+            padding: 20px 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: fadeIn 0.6s ease both;
+        }
+
+        .logo {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--ember), var(--gold));
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 0.7rem; color: white;
+            flex-shrink: 0;
+        }
+
+        .header-text {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            font-weight: 500;
+            letter-spacing: 0.04em;
+        }
+
+        .header-text strong {
+            color: var(--bone);
+            font-weight: 700;
+        }
+
+        /* === PROJECT INFO === */
+        .project-info {
+            padding: 28px 20px 20px;
+            animation: fadeUp 0.6s ease 0.1s both;
+        }
+
+        .project-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            font-size: 1.8rem;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+
+        .project-title .accent {
+            color: var(--ember);
+            font-style: italic;
+        }
+
+        .info-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 100px;
+            background: var(--coal-mid);
+            border: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: rgba(242, 236, 230, 0.7);
+        }
+
+        .chip .emoji { font-size: 0.9rem; }
+
+        .chip.urgent {
+            background: rgba(224, 90, 51, 0.15);
+            border-color: rgba(224, 90, 51, 0.3);
+            color: var(--ember-light);
+        }
+
+        /* === PHOTO COUNTER === */
+        .photo-counter {
+            padding: 0 20px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: fadeUp 0.6s ease 0.2s both;
+        }
+
+        .counter-text {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .counter-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            transition: all 0.4s ease;
+        }
+
+        .dot.active {
+            background: var(--ember);
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        /* === GALLERY === */
+        .gallery {
+            padding: 0 20px;
+            animation: fadeUp 0.6s ease 0.3s both;
+        }
+
+        .gallery-main {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4/3;
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: var(--coal-mid);
+            margin-bottom: 12px;
+            cursor: grab;
+            touch-action: pan-y pinch-zoom;
+        }
+
+        .gallery-main:active { cursor: grabbing; }
+
+        .gallery-main img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: var(--coal);
+            transition: opacity 0.3s ease;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .gallery-main img.loading {
+            opacity: 0;
+        }
+
+        /* Swipe hint */
+        .swipe-hint {
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .swipe-hint.hidden { opacity: 0; }
+
+        .swipe-arrow {
+            animation: swipeAnim 1.5s ease-in-out infinite;
+        }
+
+        @keyframes swipeAnim {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(6px); }
+        }
+
+        /* Navigation arrows */
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 5;
+        }
+
+        .nav-arrow:hover {
+            background: var(--ember);
+            border-color: var(--ember);
+        }
+
+        .nav-arrow.prev { left: 12px; }
+        .nav-arrow.next { right: 12px; }
+        .nav-arrow:disabled { opacity: 0; pointer-events: none; }
+
+        /* Image counter badge */
+        .img-counter {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            z-index: 5;
+        }
+
+        /* Thumbnails */
+        .thumbs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
+        }
+
+        .thumbs::-webkit-scrollbar { display: none; }
+
+        .thumb {
+            flex-shrink: 0;
+            width: 72px; height: 72px;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            opacity: 0.5;
+        }
+
+        .thumb.active {
+            border-color: var(--ember);
+            opacity: 1;
+            box-shadow: 0 0 0 2px rgba(224, 90, 51, 0.3);
+        }
+
+        .thumb:hover { opacity: 0.8; }
+
+        .thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* === CONTACT SECTION === */
+        .contact-section {
+            padding: 28px 20px;
+            margin-top: 8px;
+            animation: fadeUp 0.6s ease 0.4s both;
+        }
+
+        .contact-card {
+            background: var(--coal-mid);
+            border-radius: var(--radius);
+            padding: 24px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .contact-card h3 {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 16px;
+        }
+
+        .contact-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .contact-row:last-child { border-bottom: none; }
+
+        .contact-row .icon {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: rgba(224, 90, 51, 0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .contact-row .info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .contact-row .label {
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .contact-row .value {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--bone);
+            word-break: break-all;
+        }
+
+        .contact-row a {
+            color: var(--ember-light);
+            text-decoration: none;
+        }
+
+        /* === ACTION BUTTONS === */
+        .actions {
+            padding: 0 20px 32px;
+            display: flex;
+            gap: 10px;
+            animation: fadeUp 0.6s ease 0.5s both;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            border: none;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-call {
+            background: var(--ember);
+            color: white;
+            box-shadow: 0 4px 24px rgba(224, 90, 51, 0.3);
+        }
+
+        .btn-call:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(224, 90, 51, 0.45);
+        }
+
+        .btn-whatsapp {
+            background: var(--green);
+            color: white;
+            box-shadow: 0 4px 24px rgba(58, 155, 104, 0.3);
+        }
+
+        .btn-whatsapp:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(58, 155, 104, 0.45);
+        }
+
+        /* === BESCHREIBUNG === */
+        .beschreibung {
+            padding: 0 20px 20px;
+            animation: fadeUp 0.6s ease 0.45s both;
+        }
+
+        .beschreibung-card {
+            background: var(--coal-mid);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .beschreibung-card h3 {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 10px;
+        }
+
+        .beschreibung-card p {
+            color: rgba(242, 236, 230, 0.7);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* === FULLSCREEN LIGHTBOX === */
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(20px);
+        }
+
+        .lightbox.open { display: flex; }
+
+        .lightbox img {
+            max-width: 95vw;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 16px; right: 16px;
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* === LOADING STATE === */
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            gap: 16px;
+        }
+
+        .spinner {
+            width: 40px; height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--ember);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* === NO PHOTOS STATE === */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .empty-state .icon { font-size: 3rem; margin-bottom: 16px; }
+        .empty-state h2 { font-family: 'Playfair Display', serif; margin-bottom: 8px; }
+        .empty-state p { color: var(--text-dim); }
+
+        /* === FOOTER === */
+        .footer {
+            padding: 20px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.2);
+        }
+
+        /* === ANIMATIONS === */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Desktop tweaks */
+        @media (min-width: 600px) {
+            body {
+                display: flex;
+                justify-content: center;
+            }
+            .page-wrap {
+                max-width: 480px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-wrap" id="app">
+    <!-- Filled by JS -->
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <img id="lightboxImg" src="" alt="Vollbild">
+</div>
+
+<script>
+    const SUPABASE_URL = 'https://cnqedsvocvaibtxesuhe.supabase.co';
+    const BUCKET = 'lead-photos';
+    const params = new URLSearchParams(window.location.search);
+    const app = document.getElementById('app');
+
+    // Loading state
+    app.innerHTML = `
+        <div class="loading-state">
+            <div class="spinner"></div>
+            <div style="color:var(--text-dim);font-size:0.9rem;">Fotos werden geladen...</div>
+        </div>
+    `;
+
+    async function loadGallery() {
+        const anfrageId = params.get('id');
+
+        let fotos = [];
+        let kunde = '', projekt = '', budget = '', dringlichkeit = '', standort = '', phone = '', email = '', beschreibung = '';
+
+        if (anfrageId) {
+            // Load manifest from Supabase
+            try {
+                const res = await fetch(`${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/anfragen/${anfrageId}/manifest.json`);
+                if (res.ok) {
+                    const data = await res.json();
+                    fotos = data.fotos || [];
+                    kunde = data.name || 'Kunde';
+                    projekt = data.projekt || 'Projekt';
+                    budget = data.budget || '';
+                    dringlichkeit = data.dringlichkeit || '';
+                    standort = data.standort || '';
+                    phone = data.phone || '';
+                    email = data.email || '';
+                    beschreibung = data.beschreibung || '';
+                }
+            } catch(e) {
+                console.error('Manifest laden fehlgeschlagen:', e);
+            }
+        } else {
+            // Fallback: read from URL params (old format)
+            let i = 0;
+            while (params.has(`f${i}`)) {
+                fotos.push(decodeURIComponent(params.get(`f${i}`)));
+                i++;
+            }
+            kunde = params.get('name') || 'Kunde';
+            projekt = params.get('projekt') || 'Projekt';
+            budget = params.get('budget') || '';
+            dringlichkeit = params.get('dringlichkeit') || '';
+            standort = params.get('standort') || '';
+            phone = params.get('phone') || '';
+            email = params.get('email') || '';
+            beschreibung = params.get('beschreibung') || '';
+        }
+
+        let currentIndex = 0;
+
+        if (fotos.length === 0) {
+            app.innerHTML = `
+                <div class="empty-state">
+                    <div class="icon">📷</div>
+                    <h2>Keine Fotos</h2>
+                    <p>Zu dieser Anfrage wurden keine Fotos hochgeladen.</p>
+                </div>
+            `;
+            return;
+        }
+
+        const isUrgent = dringlichkeit.toLowerCase().includes('sofort') || dringlichkeit.toLowerCase().includes('notfall');
+
+        app.innerHTML = `
+            <div class="header">
+                <div class="logo">WA</div>
+                <div class="header-text"><strong>WA Digitalpartner</strong> · Projektfotos</div>
+            </div>
+
+            <div class="project-info">
+                <h1 class="project-title"><span class="accent">${projekt}</span> — ${kunde}</h1>
+                <div class="info-chips">
+                    ${budget ? `<div class="chip"><span class="emoji">💰</span>${budget}</div>` : ''}
+                    ${dringlichkeit ? `<div class="chip ${isUrgent ? 'urgent' : ''}"><span class="emoji">${isUrgent ? '🚨' : '📅'}</span>${dringlichkeit}</div>` : ''}
+                    ${standort ? `<div class="chip"><span class="emoji">📍</span>${standort}</div>` : ''}
+                    <div class="chip"><span class="emoji">📸</span>${fotos.length} Foto${fotos.length > 1 ? 's' : ''}</div>
+                </div>
+            </div>
+
+            <div class="photo-counter">
+                <div class="counter-text">Projektfotos</div>
+                <div class="counter-dots" id="dots">
+                    ${fotos.map((_, idx) => `<div class="dot ${idx === 0 ? 'active' : ''}" data-idx="${idx}"></div>`).join('')}
+                </div>
+            </div>
+
+            <div class="gallery">
+                <div class="gallery-main" id="galleryMain" onclick="openLightbox()">
+                    <img id="mainImg" src="${fotos[0]}" alt="Foto 1" draggable="false">
+                    <div class="img-counter" id="imgCounter">1 / ${fotos.length}</div>
+                    ${fotos.length > 1 ? `
+                        <button class="nav-arrow prev" id="prevBtn" onclick="event.stopPropagation(); navigate(-1)" disabled>‹</button>
+                        <button class="nav-arrow next" id="nextBtn" onclick="event.stopPropagation(); navigate(1)">›</button>
+                        <div class="swipe-hint" id="swipeHint"><span class="swipe-arrow">→</span> Wischen für mehr</div>
+                    ` : ''}
+                </div>
+                ${fotos.length > 1 ? `
+                    <div class="thumbs" id="thumbs">
+                        ${fotos.map((url, idx) => `
+                            <div class="thumb ${idx === 0 ? 'active' : ''}" onclick="goTo(${idx})">
+                                <img src="${url}" alt="Foto ${idx + 1}" loading="lazy">
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            </div>
+
+            ${beschreibung ? `
+                <div class="beschreibung">
+                    <div class="beschreibung-card">
+                        <h3>Beschreibung vom Kunden</h3>
+                        <p>${beschreibung}</p>
+                    </div>
+                </div>
+            ` : ''}
+
+            <div class="contact-section">
+                <div class="contact-card">
+                    <h3>Kontaktdaten</h3>
+                    ${kunde ? `
+                        <div class="contact-row">
+                            <div class="icon">👤</div>
+                            <div class="info">
+                                <div class="label">Name</div>
+                                <div class="value">${kunde}</div>
+                            </div>
+                        </div>
+                    ` : ''}
+                    ${phone ? `
+                        <div class="contact-row">
+                            <div class="icon">📞</div>
+                            <div class="info">
+                                <div class="label">Telefon</div>
+                                <div class="value"><a href="tel:${phone}">${phone}</a></div>
+                            </div>
+                        </div>
+                    ` : ''}
+                    ${email ? `
+                        <div class="contact-row">
+                            <div class="icon">✉️</div>
+                            <div class="info">
+                                <div class="label">E-Mail</div>
+                                <div class="value"><a href="mailto:${email}">${email}</a></div>
+                            </div>
+                        </div>
+                    ` : ''}
+                    ${standort ? `
+                        <div class="contact-row">
+                            <div class="icon">📍</div>
+                            <div class="info">
+                                <div class="label">Standort</div>
+                                <div class="value">${standort}</div>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+
+            ${phone ? `
+                <div class="actions">
+                    <a href="tel:${phone}" class="btn-action btn-call">📞 Anrufen</a>
+                    <a href="https://wa.me/${phone.replace(/[^0-9]/g, '')}" class="btn-action btn-whatsapp" target="_blank">💬 WhatsApp</a>
+                </div>
+            ` : ''}
+
+            <div class="footer">Powered by WA Digitalpartner</div>
+        `;
+
+        // Swipe support
+        if (fotos.length > 1) {
+            const gallery = document.getElementById('galleryMain');
+            let startX = 0, isDragging = false;
+
+            gallery.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                isDragging = true;
+            }, { passive: true });
+
+            gallery.addEventListener('touchend', (e) => {
+                if (!isDragging) return;
+                const diff = startX - e.changedTouches[0].clientX;
+                if (Math.abs(diff) > 50) {
+                    navigate(diff > 0 ? 1 : -1);
+                }
+                isDragging = false;
+            }, { passive: true });
+
+            gallery.addEventListener('mousedown', (e) => {
+                startX = e.clientX;
+                isDragging = true;
+                e.preventDefault();
+            });
+
+            document.addEventListener('mouseup', (e) => {
+                if (!isDragging) return;
+                const diff = startX - e.clientX;
+                if (Math.abs(diff) > 50) {
+                    navigate(diff > 0 ? 1 : -1);
+                }
+                isDragging = false;
+            });
+
+            setTimeout(() => {
+                const hint = document.getElementById('swipeHint');
+                if (hint) hint.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Make functions global
+        window.navigate = function(dir) {
+            const newIndex = currentIndex + dir;
+            if (newIndex < 0 || newIndex >= fotos.length) return;
+            window.goTo(newIndex);
+        };
+
+        window.goTo = function(idx) {
+            currentIndex = idx;
+            document.getElementById('mainImg').src = fotos[idx];
+            document.getElementById('imgCounter').textContent = `${idx + 1} / ${fotos.length}`;
+
+            document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+            document.querySelectorAll('.thumb').forEach((t, i) => {
+                t.classList.toggle('active', i === idx);
+                if (i === idx) t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            });
+
+            const prev = document.getElementById('prevBtn');
+            const next = document.getElementById('nextBtn');
+            if (prev) prev.disabled = idx === 0;
+            if (next) next.disabled = idx === fotos.length - 1;
+
+            const hint = document.getElementById('swipeHint');
+            if (hint) hint.classList.add('hidden');
+        };
+
+        window.openLightbox = function() {
+            document.getElementById('lightboxImg').src = fotos[currentIndex];
+            document.getElementById('lightbox').classList.add('open');
+        };
+    }
+
+    window.closeLightbox = function() {
+        document.getElementById('lightbox').classList.remove('open');
+    };
+
+    document.getElementById('lightbox').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeLightbox();
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft' && window.navigate) navigate(-1);
+        if (e.key === 'ArrowRight' && window.navigate) navigate(1);
+        if (e.key === 'Escape') closeLightbox();
+    });
+
+    loadGallery();
+</script>
+
+</body>
+</html>
